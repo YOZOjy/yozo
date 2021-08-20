@@ -1,0 +1,3 @@
+<plugins>
+  <plugin name='hello' version='1.0.0' type='wp' location='http://localhost:8080/dist\'/>
+</plugins>
