@@ -1,10 +1,10 @@
-<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnWPSWorkTabLoad">
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnYozoLoad">
     <ribbon startFromScratch="false">
         <tabs>
-            <tab id="WPSWorkExtTab" label="OA辅助" getVisible="OnGetVisible">                <!-- OA菜单开启显隐处理-->
-                <group id="grpWPSClound" label="云文档相关功能" getVisible="OnGetVisible">
+            <tab id="YOZOWorkExtTab" label="OA辅助" getVisible="OnGetVisible">                <!-- OA菜单开启显隐处理-->
+                <group id="grpWPSClound" label="文档相关功能" getVisible="OnGetVisible">
 					<button id="btnShowTaskPane" label="右侧面板" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
-					<button id="btnOpenLocalWPSYUN" label="导入文件" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>                   
+                    <button id="btnOpenLocal" label="导入文件" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>                   
                 </group>
                 <group id="grpWPSWork" label="OA助手文档操作功能组" getVisible="OnGetVisible">
                     <button id="btnSaveToServer" label="保存到OA" onAction="OnAction" getEnabled="OnGetEnabled" getImage="GetImage" size="large"/>
@@ -18,8 +18,9 @@
                     <button id="btnInsertSeal" label="印章" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large" />
                     <!-- <button id="btnUploadOABackup" label="备份正文" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/> -->
                     <button id="btnClearRevDoc" label="清稿" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large" />
-                    <button id="btnInsertBookmark" label="导入书签" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large" />
+                    <!-- <button id="btnInsertBookmark" label="导入书签" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large" /> -->
                     <button id="btnImportTemplate" label="导入模板" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                    <button id="btnHistory" label="历史版本" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                 </group>
                 <group id="grpRevision" label="OA修订功能按钮组" getVisible="OnGetVisible">
                     <button id="btnOpenRevision" label="打开修订" onAction="OnAction" getLabel="OnGetLabel" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large" />
@@ -29,15 +30,24 @@
                 </group>
                 <group id="grpFreqUsed" label="常用功能组" getVisible="OnGetVisible">
 					<button id="btnInsertPic" label="插入图片" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
-                    <button id="btnInsertDate" label="插入日期" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                    <button id="btnInsertWaterMark" label="插入水印" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                     <button id="btnPageSetup" label="页面设置" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
-					<button id="btnOpenScan" label="打开扫描仪" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+					<!-- <button id="btnOpenScan" label="打开扫描仪" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/> -->
                     <button id="btnQRCode" label="二维码" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                     <button id="btnPrintDOC" label="打印设置" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                 </group>
-                <group id="grpDebug" label="调试功能" getVisible="OnGetVisible">
-					<button id="btnDebug" label="调试窗口" getLabel="OnGetLabel" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
+                <group id="grpNotice" label="通知消息" getVisible="OnGetVisible">
+                    <button id="btnSendMessage" label="给业务系统前端发送消息" onAction="OnAction" getEnabled="OnGetEnabled" getVisible="OnGetVisible" getImage="GetImage" size="large"/>
                 </group>
+				<!--Java解析xml不支持
+                <group id="grpDocSource" label="文件来源" getVisible="OnGetVisible">
+                    <labelControl id="lblDocSourceTitle" label="文件来源：" />
+                    <button id="lblDocSourceValue" label="ddddd" onAction="OnAction" getLabel="OnGetLabel" />
+                    <labelControl id="lblDocLandMode" label="" getLabel="OnGetLabel" getVisible="OnGetVisible" />
+                    <labelControl id="lblUserName" label="用户" getLabel="OnGetLabel" />
+                    <button id="btnUserName" label="用户" onAction="OnAction" getLabel="OnGetLabel" />
+                </group> !-->
+				
             </tab>
         </tabs>
     </ribbon>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
+    <title>签章</title>
     <meta charset="UTF-8">
-    <title>印章页面</title>
-    <script type="text/javascript" src='js/selectSeal.js'></script>
+    <script type="text/javascript" src='js/main.js'></script>
+    <script type="text/javascript" src="otherslib/lib/vue.min.js"></script>
     <style type="text/css">
         * {
             box-sizing: border-box;
@@ -19,7 +20,7 @@
 
         html,
         body,
-        #seal {
+        #template {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -35,77 +36,126 @@
             height: 100%;
         }
 
-        #seal_name,
-        #seal_password {
-            width: 38%;
-            float: left;
-            margin-left: 15px;
-        }
-
-        .seal_control {
-            height: 60%;
-            font-size: 16px;
-        }
-
-        #seal_load {
-            width: 13%;
-            float: right;
-            margin-right: 35px;
-        }
-
-        #seal_load>button {
+        #file_select {
             width: 100%;
+            padding-left: 5%;
         }
 
-        #btnBox {
-            padding-left: 75%;
-            line-height: 4em;
+        .def_control {
+            height: 55%;
+            width: 100%;
+            font-size: 18px;
         }
 
-        #btnBox>div {
-            display: inline-block;
-            width: 47%;
-        }
-
-        #btnBox button {
-            height: 60%;
-            width: 90%;
-            font-size: 14px;
+        .btn_box {
+            width: 16%;
+            float: right;
+            line-height: 4.5em;
+            margin-right: 3%;
         }
     </style>
 </head>
 
 <body>
-    <div id="seal">
-        <div class="row clear" style="height: 15%;padding-top: 2%;">
-            <div id="seal_name">
-                <span>印章名称：</span>
-                <select class="def_control" id="qz" style="width: 80%;" v-model="bookItem">
-                    <option value="-1">请选择印章</option>
-                    <option value="测试印章1">测试印章1</option>
-                    <option value="测试印章2">测试印章2</option>
+
+    <div id="template">
+        <div class="row" style="height:50%;padding-top: 3%;">
+            <div id="file_select">
+                <span>签章名称：</span>
+                <select class="def_control" style="width: 80%;" id="def_control"; v-model="templateItem">
+                    <option value="-1">请选择签章</option>
+                    <!-- <option v-for="values in templates">values[1]</option> -->
                 </select>
             </div>
-            <!-- <div id="seal_password">
-                <span>密码：</span>
-                <input class="seal_control" type="password" v-model="sealPassword" placeholder="请输入密码" />
-            </div>
-            <div id="seal_load">
-                <button class="seal_control" @click="vm.loadSeal()">盖章</button>
-            </div> -->
         </div>
-        <div id="seal_preview" class="row" style="height: 70%;padding-top: 5%;overflow: auto;">
-            <img :src="seal" v-if="visible" style="width: 50%;height: 85%;" draggable="false">
-        </div>
-        <div id="btnBox" class="row" style="height: 15%;">
-            <div>
-                <button class="def_control" type="button" id="add" onclick="addQz()">确定</button>
-            </div>
-            <div>
+        <div class="row" style="height: 50%;">
+            <div class="btn_box">
                 <button class="def_control" type="button" onclick="cancel()">取消</button>
+            </div>
+            <div class="btn_box">
+                <button class="def_control" type="button" onclick="selectSeal()">盖章</button>
             </div>
         </div>
     </div>
+
 </body>
 
 </html>
+<script>
+    window.onload = function(){
+        //获取下拉列表数据
+        var doc = yozo.WApplication().getActiveDocument();
+         var templateDataUrl = getDocParamsValue(doc, "sealPath");
+        //  var templateDataUrl = "http://39.100.72.227:9999/yz6/OASoft/pull/getQianzhang";
+                // if (templateDataUrl == "") { templateDataUrl = OA_DOOR.templateDataUrl; }
+                $.ajax({
+                    url: templateDataUrl,
+                    async: false,
+                    method: "GET",
+                   // dataType: 'application/x-www-form-urlencoded;charset=UTF-16LE',
+                    success: function (res) {
+                       let modelList = res;
+                       for(let i = 0 ; i < modelList.length ; i++){
+                           let optionName = modelList[i][1];
+                           let optionValue = modelList[i][0];
+                           $('#def_control').append("<option value='"+optionValue+"'>"+optionName+"</option>");
+                       }
+                  
+                    },
+                    error: function (res) {
+                        alert("获取响应失败");
+                        _this.templates = {}
+                    }
+                });
+    }
+
+
+    function addQz(l_picPath,l_picHeight,l_picWidth){
+        var l_doc; //文档对象
+        l_doc = yozo.WApplication().getActiveDocument();
+        var l_picHeight;
+        var l_picWidth;
+        if (l_picHeight == "") { //设定图片高度
+            l_picHeight = 39.117798; //13.8mm=39.117798磅
+        }
+        if (l_picWidth == "") { //设定图片宽度
+            l_picWidth = 72; //49.7mm=140.880768磅
+        }
+    
+        var l_shape = l_doc.getShapes().addPicture(l_picPath, false, true,null,null,null,null,null);
+        l_shape.select();
+        l_shape.setHeight(l_picHeight);
+        l_shape.setWidth(l_picWidth);                   
+    }
+
+    // 获取选中项，
+    function selectSeal() {
+        var templateId = $('#def_control').val()
+        console.log("templateId=",templateId);
+        if (templateId == -1) {
+            alert('请选中模板!!');
+            return;
+        }
+        var p_Doc = yozo.WApplication().getActiveDocument();
+        // var templatePath = GetDocParamsValue(p_Doc, "templatePath");
+        var templatePath = "http://39.100.72.227:9999/yz6/OASoft/pull/getQianzhangs";
+        // if (templatePath == "") { templatePath = OA_DOOR.templateBaseURL; }
+        // var templateURL = templatePath + templateId;
+        $.get(templatePath,function(ret){
+            addQz(ret,"","")
+        })
+       
+        window.opener = null;
+        window.open('', '_self', '');
+        window.close();
+        // yozo.getOAAssist().shellExecute("yozowpweblaunch://");   // 将Yozo程序置前
+    }
+
+
+    function cancel() { // 取消按钮
+        window.close();
+        // yozo.getOAAssist().shellExecute("yozowpweblaunch://");   // 将Yozo程序置前
+    }
+
+   
+</script>

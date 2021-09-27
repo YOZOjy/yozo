@@ -1,23 +1,16 @@
 <html>
 <meta charset="utf-8">
-<title>套用红头</title>
+<title>历史版本</title>
 </head>
 
 <body onload="getAllTemplelists()">
     <script type="text/javascript" src='js/main.js'></script>
-    <div id="search">
-        <span>关键词：</span>
-        <input id="content" type="text" style="width:245px">
-        <button type="button" onClick="search()">查询</button>
-        <br />
-        <br />
-    </div>
     <select id="templates" size=5 style='width:360px'>
         <!--这里ajax动态拉取。-->
     </select>
     <br />
     <br />
-    <button type="button" onClick="selectTemplate()">套红头</button>
+    <button type="button" onClick="selectTemplate()">打开</button>
 </body>
 
 </html>
@@ -35,7 +28,7 @@ function selectTemplate() {
     var redId = obj.options[index].getAttribute("value");
     var hongtaoUrl;
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("get", "http://39.100.72.227:9999/yz6/OASoft/pull/getTaohongs", true); //以POST方式请求该接口
+    xmlhttp.open("get", "http://39.100.72.227:9999/yz6/OASoft/pull/getBanbens", true); //以POST方式请求该接口
     xmlhttp.setRequestHeader("Content-type",
         "application/x-www-form-urlencoded;charset=UTF-16LE"); //添加Content-type
     xmlhttp.send(); //发送请求参数间用&分割
@@ -45,12 +38,9 @@ function selectTemplate() {
             var text = xmlhttp.responseText; //使用接口返回内容，响应内容
             hongtaoUrl = text;
 
-            var activeDoc = yozoApp.getActiveDocument();
-   
-            yozoApp.insertDocumentField("正文");
-            console.log("hongtaoUrl",hongtaoUrl)
-            yozoApp.insertDocument("正文", hongtaoUrl);
-            yozoApp.cursorToDocumentField("正文", 2);
+          
+            yozoApp.openDocumentRemote(hongtaoUrl,false);
+           
 
         }
     }
@@ -59,22 +49,11 @@ function selectTemplate() {
     window.open('', '_self', '');
     window.close();
 }
-//判断是否是word文档
-function isWord(suffix) {
-    var suffixArray = ["doc", "dot", "uot", "uof", "eit", "docx", "docm", "dotm"];
-    for (var f1 in suffixArray) {
-        if (suffixArray[f1].indexOf(suffix) > -1) {
-            return true;
-        }
-    }
-    return false;
-}
 
 function getAllTemplelists() {
     var doc = yozo.WApplication().getActiveDocument();
-        //获取套红地址
-         var templateDataUrl = getDocParamsValue(doc, "redHeadPath");
-        //  templateDataUrl = "http://39.100.72.227:9999/yz6/OASoft/pull/getTaohong";
+         var templateDataUrl = getDocParamsValue(doc, "historyPath");
+         //templateDataUrl = "http://39.100.72.227:9999/yz6/OASoft/pull/getBanben";
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         //当接受到响应时回调该方法
@@ -86,12 +65,12 @@ function getAllTemplelists() {
                 var element = resultArr[i]
                 var myOption = document.createElement("option"); //动态创建option标签
                var suffix = element[2].split(".")[1]
-               if(isWord(suffix)){
+             
                     myOption.value = element[0]; //红头文档id
                     myOption.text = element[1]; //红头文档名称
                    // myOption.text = element[2]; //红头文档名称
                     templates.add(myOption);
-                }
+           
             }
             console.log("text==",text)
         }
@@ -105,33 +84,5 @@ function getAllTemplelists() {
   
 }
 
-
-function search() {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        //当接受到响应时回调该方法
-        if (xmlhttp.readyState == 4 && (xmlhttp.status == 200 || xmlhttp.status == 0)) {
-            var text = xmlhttp.responseText; //使用接口返回内容，响应内容
-            var resultArr = [];
-            resultArr = eval("("+text+")"); ;
-            for (var i = 0; i < resultArr.length; i++) {
-                var element = resultArr[i]
-                var myOption = document.createElement("option"); //动态创建option标签
-               var suffix = element[2].split(".")[1]
-               if(isWord(suffix)){
-                    myOption.value = element[0]; //红头文档id
-                    myOption.text = element[1]; //红头文档名称
-                   // myOption.text = element[2]; //红头文档名称
-                    templates.add(myOption);
-                }
-            }
-        }
-    }
-
-    xmlhttp.open("get", "http://39.100.72.227:9999/yz6/OASoft/pull/getTaohong", true); //以POST方式请求该接口
-    xmlhttp.setRequestHeader("Content-type",
-        "application/x-www-form-urlencoded;charset=UTF-16LE"); //添加Content-type
-    xmlhttp.send(); //发送请求参数间用&分割
-}
 
 </script>

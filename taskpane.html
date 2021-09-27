@@ -1,32 +1,143 @@
 <!DOCTYPE html>
+<html lang="zh-CN">
+
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <title>操作书签</title>
+    <style type="text/css">
+        .content {
+            font-size: 15px;
+            color: darkslategray;
+            margin: 5px;
+        }
+
+        .content_red {
+            font-weight: bold;
+            color: red;
+        }
+
+        .li {
+            cursor: pointer;
+            color: blueviolet;
+            margin: 10px;
+        }
+
+        .def_control {
+            height: 100%;
+            width: 100%;
+            font-size: 18px;
+        }
+
+        .btn_box {
+            float: left;
+            line-height: 3.3em;
+            margin-left: 2%;
+        }
+    </style>
 </head>
-<body>
-  <div>js add demo plugin hello</div>
-  <table>
-    <tr>
-    <td>
-    <div id="doc" align="left" style="position:inherit">
-    <button onclick="newDoc()">新建</button><br/>
-    <button onclick="openDoc()">打开远程</button><br/>
-    <button onclick="OnBtnSaveAsLocalFile()">另存文档</button><br/>
-    <button onclick="formUpload()">表单上传</button><br/>
-    <button onclick="OpenLocalFile()">打开本地文档插入</button><br/>
-    <button onclick="OnInsertRedHeaderClick()">套红</button><br/>
-    <button onclick="OnBtnClearRevDoc()">清稿</button><br/>
-    <button onclick="OnOpenRevisions()">打开修订</button><br/>
-    <button onclick="OnCloseRevisions()">关闭修订</button><br/>
-    <button onclick="OnAcceptAllRevisions()">接受修订</button><br/>
-    <button onclick="OnRejectAllRevisions()">拒绝修订</button><br/>
-    <button onclick="DoInsertPicToDoc()">光标插入图片</button><br/>
-    <button onclick="OnPageSetupClicked()">页面设置</button><br/>
-    <button onclick="OnPrintDocBtnClicked()">打印设置</button><br/>
-    <button onclick="addBookmark()">添加书签</button><br/>
-    
+
+<body onload="bookMarkList()">
+    <script type="text/javascript" src='js/main.js'></script>
+    <div class="content">这是一个网页，按f12可以打开调试器</div>
+    <div class="content">书签列表如下:</div>
+    <div id="bookMarkDiv">
+
     </div>
-    </td>
-    </table>
-  <script src='js/taskpane.js'></script>
+    <div id="repleaseBookMarkDiv" class="content">
+        <div class="content">选择的书签是：</div>
+        <div class="content_red" id="selectBookMarkId"></div>
+        <div class="content">替换的内容是：</div>
+        <div class="content">
+            <textarea id="repleaseBookMarkContent" style="margin: 0px; width: 220px; height: 90px;"></textarea></div>
+        <div class="btn_box">
+            <button class="def_control" type="button" id="repleaseBookMarkButton"
+                onclick="repleaseBookMarkClick()">书签内容替换</button>
+        </div>
+        <div class="btn_box">
+            <button class="def_control" type="button" id="insertLocalFileButton"
+                onclick="insertLocalFileClick()">本地文件替换已选择书签</button>
+        </div>
+    </div>
 </body>
+
 </html>
+
+<script>
+   yozo.getYozoEvent().addAppEventListener("WindowActivate", onDocActiveChange) //当前文档切换后的事件回调通知
+
+    //当前文档切换到其它文档时，重新获取新的文档的书签列表
+    function onDocActiveChange(doc, docwin){
+        bookMarkList()
+        clearSelectionBookmark()
+    }
+    //获取文档中的书签列表并定义列表项的点击事件
+    function bookMarkList(){
+        let doc = yozo.WApplication().getActiveDocument();
+        if (!doc)
+            return
+
+        document.getElementById('bookMarkDiv').innerHTML = ""
+        let innerHtml = ""
+        let bookMarkCount = doc.getBookmarks().getCount()
+        for (let i = 1; i <= bookMarkCount; ++i) {
+            let bookMakrItem = doc.getBookmarks().item(i)
+            let bookMarkName = bookMakrItem.getName()
+            innerHtml = innerHtml + "<li class='li' onclick=\"bookMarkClick('" + bookMarkName + "')\">" + bookMarkName +
+                "</li>"
+        }
+
+        document.getElementById('bookMarkDiv').innerHTML = innerHtml
+    }
+    //书签列表项的点击事件
+    function bookMarkClick(bookMarkName) {
+        let doc = yozo.WApplication().getActiveDocument();
+        document.getElementById('selectBookMarkId').innerHTML = bookMarkName
+        if (!doc)
+            return
+        let bookMark = doc.getBookmarks().item(bookMarkName)
+        if (bookMark)
+            bookMark.getRange().select()
+    }
+    //书签内容替换按钮点击事件
+    function repleaseBookMarkClick() {
+       getPositionInsert('text')
+    }
+    //本地文件替换已选择书签点击事件
+    function insertLocalFileClick() {
+        getPositionInsert('file')
+    }
+    //定位到选择的书签位置的最末，插入文本内容或本地文件
+    function getPositionInsert(textOrFile) {
+        let doc = yozo.WApplication().getActiveDocument();
+        let bookMarks = doc.getBookmarks()
+        let selectBookMarkId = document.getElementById("selectBookMarkId").innerHTML
+        let textareaStr = document.getElementById("repleaseBookMarkContent").value
+        if (!doc)
+            return
+        if (selectBookMarkId.length == 0) {
+            alert('请选择需要替换的书签')
+            return
+        } else {
+            let bookMarkItem = bookMarks.item(selectBookMarkId)
+            if (bookMarkItem) {
+                let bookMarkName = bookMarkItem.getName()
+                let bookMarkRange = bookMarkItem.getRange()
+                if (textOrFile == 'text') {
+                    bookMarkRange.setText("textareaStr")
+                    bookMarkRange.select()  //内容替换后不会刷新，让wps作一次刷新，这可能是wps的bug
+                } else {
+                    OpenLocalFile()
+                }
+                //检测一下bookmark是不是失效了
+                if (!bookMarks.item(bookMarkName)){
+                    bookMarks.add(bookMarkName, bookMarkRange)
+                }
+                bookMarkList()  //执行完内容替换后刷新任务窗格的书签列表
+            }
+        }
+    }
+    //清空选择的书签
+    function clearSelectionBookmark(){
+        document.getElementById('selectBookMarkId').innerHTML = ''
+    }
+</script>
