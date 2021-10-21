@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<HTML>
+
+<HEAD>
+	<TITLE>永中Office嵌入演示页面</TITLE>
+	<META http-equiv=Content-Type content="text/html; charset=utf-8">
+	<LINK href="style.css" type=text/css rel=css/stylesheet>
+	<LINK href="css/style.css" type=text/css rel=stylesheet>
+	<META content="MSHTML 6.00.2900.5921" name=GENERATOR>
+	<script type="text/javascript">
+		function menuOnClick(id) {
+			var id = document.getElementById(id);
+			var dis = id.style.display;
+			if (dis != "none") {
+				id.style.display = "none";
+			} else {
+				id.style.display = "block";
+			}
+		}
+	</script>
+
+</HEAD>
+<!-- <BODY onload="InitFrame();" style="BACKGROUND: #ccc" > -->
+<CENTER>
+	<DIV style="PADDING-RIGHT: 0px; PADDING-LEFT: 0px; BACKGROUND: #fff; PADDING-BOTTOM: 0px; MARGIN: 50px 0px 0px; WIDTH: 1024px; PADDING-TOP: 30px; HEIGHT: 750px"
+		align=center>
+		<FORM name=myform>
+			<TABLE class=TableBlock width="90%" cellpadding="0" cellspacing="0">
+				<TBODY>
+					<TR class=TableHeader>
+						<TD width="180"><img valign=middle src="css/logo.bmp" width="180" height="60" /></TD>
+						<TD colSpan=2 valign=middle>
+							<font size=5> 永中Office嵌入演示</font>
+						</TD>
+					</TR>
+				</TBODY>
+			</TABLE>
+			<BR>
+			<TABLE class=TableBlock width="90%">
+				<TBODY>
+					<TR>
+						<TD class=leftTableData vAlign=top width="15%">
+							<!-- <DIV class=menuItem onclick="InitFrame();">插件初始化</DIV> -->
+							<!-- <DIV class=menuItem onclick="getPluginVersion();">插件版本号</DIV> -->
+							<DIV class=menuItem onclick="menuOnClick('chc')">文档接口</DIV>
+							<DIV id=chc style="DISPLAY: none">
+								<INPUT class=btn onclick="newDoc();" type=button value=新建空白文档>
+								<INPUT class=btn onclick="openRmote();" type=button value=打开OA文档>
+								<INPUT class=btn onclick="setBookMark();" type=button value=批量设置书签>
+							</DIV>
+						</TD>
+
+						<TD class=TableData vAlign=top width="85%">
+							<div id="yozo">
+							</div>
+						</TD>
+					</TR>
+				</TBODY>
+			</TABLE>
+		</FORM>
+	</DIV>
+</CENTER>
+</BODY>
+
+</HTML>
+
+<script type="text/javascript" src="./js/jquery.js"></script>
+<script type="text/javascript" src="./js/reconnecting-websocket.js"></script>
+<script type="text/javascript" src="./js/yozoinvoke.js"></script>
+<script type="text/javascript">
+
+	//打开OA文档
+	function openRmote() {
+		var filePath = prompt("请输入打开文件路径", "http://106.14.225.23:8080/plugins/表格工具集用户手册.docx");
+
+		window.location.href = "yozowpweblaunch://";
+		//alert("filePath  =" + filePath)
+		openWS(filePath);
+	}
+
+	/**
+	 * 打开服务器文档
+	 */
+	function openWS(filePath) {
+		//注册
+		var msg = JSON.stringify({
+			code: 'registerNotify',
+			appType: 1,
+			pluginName: "oaassist"
+		});
+		YozoInvoke.regWebNotify(msg, function (event) {
+			var span = document.getElementById("yozo")
+    		span.innerHTML = event
+			console.log("getMsg from EIO => " + event);
+		})
+		//文档携带参数
+		var info = {};
+		info.funcs = [{
+			"OpenDoc": {
+				"userName": "啊哈",
+				"docid": "1234",
+				"fileName": "我是OA文件",
+				"filePath": "http://106.14.225.23:8080/plugins/21.docx",
+				"uploadPath": "http://yzoa.yozosoft.com:8888/yz8/servlet/jcsUploadServlet?mtpId=&attachmentId=C985519273F000018F3B10FAD0F039A0&"
+					+ "OfficeControlType=1&BIZ_TYPE=archives&fileType=Word.Document&iframeId=1631758718673_0&fileOldName=1631758718673_0&fileSuffix=.doc",
+				"redHeadPath": "http://39.100.72.227:9999/yz6/OASoft/pull/getTaohong",
+				"historyPath": "http://39.100.72.227:9999/yz6/OASoft/pull/getBanben",
+				"sealPath": "http://39.100.72.227:9999/yz6/OASoft/pull/getQianzhang",
+				"templatePath": "http://39.100.72.227:9999/yz6/OASoft/pull/getMuban"
+			}
+		}]
+		var param = JSON.stringify({
+			appType: 1,
+			pluginName: "oaassist",
+			pluginFunc: 'Dispatcher',
+			dataInfo: info
+		});
+		YozoInvoke.invoke(param,function(retValue){
+			console.log("retValue=",retValue)
+		});
+
+	}
+	//新建文档
+	function newDoc() {
+		//yozowpweblaunch 打开文档
+		window.location.href = "yozowpweblaunch://";
+		newDocument();
+	}
+	//新建文档
+	function newDocument() {
+		//文档携带参数
+		var info = {};
+		info.funcs = [{
+			"NewDoc": {
+				"docid": "1234",
+				"uploadPath": "http://yzoa.yozosoft.com:8888/yz8/servlet/jcsUploadServlet?mtpId=&attachmentId=C985519273F000018F3B10FAD0F039A0&"
+					+ "OfficeControlType=1&BIZ_TYPE=archives&fileType=Word.Document&iframeId=1631758718673_0&fileOldName=1631758718673_0&fileSuffix=.doc"
+			}
+		}];
+		var param = JSON.stringify({
+			appType: 1,
+			pluginName: "oaassist",
+			pluginFunc: 'Dispatcher',
+			dataInfo: info
+		});
+		YozoInvoke.invoke(param,function(data){
+			console.log("data=",data)
+		});
+
+	}
+	//批量设置书签
+	function setBookMark() {
+		//书签参数
+		var info = {};
+		info.funcs = [{
+			"setMultiBookmarkValue": {
+				"紧急程度": "紧急程度1234",
+				"标题": "标题1234",
+				"日期": "日期1234",
+				"发文字号": "发文字号1234"
+			}
+		}];
+		var param = JSON.stringify({
+			appType: 1,
+			pluginName: "oaassist",
+			pluginFunc: 'Dispatcher',
+			dataInfo: info
+		});
+		YozoInvoke.invoke(param, function (response) {
+			console.log(response);
+		});
+	}
+
+</script>

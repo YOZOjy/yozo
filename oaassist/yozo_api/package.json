@@ -1,0 +1,7 @@
+{
+  "description": "yozo js api",
+  "main": "./index.d.ts",
+  "name": "yozo_api",
+  "types": "./index.d.ts",
+  "version": "1.0.0"
+}
